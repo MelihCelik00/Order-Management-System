@@ -4,8 +4,6 @@ import com.oms.dto.CustomerDTO;
 import com.oms.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,15 +32,9 @@ public class CustomerController {
         @ApiResponse(responseCode = "400", description = "Invalid input or email already exists")
     })
     @PostMapping
-    public ResponseEntity<ApiResponse<CustomerDTO>> createCustomer(
-            @Valid @RequestBody CustomerDTO customerDTO) {
-        try {
-            CustomerDTO createdCustomer = customerService.createCustomer(customerDTO);
-            return ResponseEntity.ok(new ApiResponse<>("SUCCESS", "Customer created successfully", createdCustomer));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                .body(new ApiResponse<>("ERROR", e.getMessage(), null));
-        }
+    public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody CustomerDTO customerDTO) {
+        CustomerDTO createdCustomer = customerService.createCustomer(customerDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCustomer);
     }
 
     @Operation(
@@ -54,15 +46,11 @@ public class CustomerController {
         @ApiResponse(responseCode = "404", description = "Customer not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<CustomerDTO>> getCustomerById(
+    public ResponseEntity<CustomerDTO> getCustomerById(
             @Parameter(description = "Customer ID") @PathVariable Long id) {
-        try {
-            CustomerDTO customer = customerService.getCustomerById(id);
-            return ResponseEntity.ok(new ApiResponse<>("SUCCESS", "Customer retrieved successfully", customer));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ApiResponse<>("ERROR", e.getMessage(), null));
-        }
+        CustomerDTO customer = customerService.getCustomerById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(customer);
+
     }
 
     @Operation(
@@ -74,15 +62,10 @@ public class CustomerController {
         @ApiResponse(responseCode = "404", description = "Customer not found")
     })
     @GetMapping("/email/{email}")
-    public ResponseEntity<ApiResponse<CustomerDTO>> getCustomerByEmail(
+    public ResponseEntity<CustomerDTO> getCustomerByEmail(
             @Parameter(description = "Customer email") @PathVariable String email) {
-        try {
-            CustomerDTO customer = customerService.getCustomerByEmail(email);
-            return ResponseEntity.ok(new ApiResponse<>("SUCCESS", "Customer retrieved successfully", customer));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ApiResponse<>("ERROR", e.getMessage(), null));
-        }
+        CustomerDTO customer = customerService.getCustomerByEmail(email);
+        return ResponseEntity.status(HttpStatus.OK).body(customer);
     }
 
     @Operation(
@@ -91,9 +74,9 @@ public class CustomerController {
     )
     @ApiResponse(responseCode = "200", description = "List of customers retrieved successfully")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CustomerDTO>>> getAllCustomers() {
+    public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
         List<CustomerDTO> customers = customerService.getAllCustomers();
-        return ResponseEntity.ok(new ApiResponse<>("SUCCESS", "Customers retrieved successfully", customers));
+        return ResponseEntity.status(HttpStatus.OK).body(customers);
     }
 
     @Operation(
@@ -106,16 +89,12 @@ public class CustomerController {
         @ApiResponse(responseCode = "404", description = "Customer not found")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<CustomerDTO>> updateCustomer(
+    public ResponseEntity<CustomerDTO> updateCustomer(
             @Parameter(description = "Customer ID") @PathVariable Long id,
             @Valid @RequestBody CustomerDTO customerDTO) {
-        try {
+
             CustomerDTO updatedCustomer = customerService.updateCustomer(id, customerDTO);
-            return ResponseEntity.ok(new ApiResponse<>("SUCCESS", "Customer updated successfully", updatedCustomer));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                .body(new ApiResponse<>("ERROR", e.getMessage(), null));
-        }
+            return ResponseEntity.status(HttpStatus.OK).body(updatedCustomer);
     }
 
     @Operation(
@@ -127,14 +106,9 @@ public class CustomerController {
         @ApiResponse(responseCode = "404", description = "Customer not found")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteCustomer(
+    public ResponseEntity<Void> deleteCustomer(
             @Parameter(description = "Customer ID") @PathVariable Long id) {
-        try {
             customerService.deleteCustomer(id);
-            return ResponseEntity.ok(new ApiResponse<>("SUCCESS", "Customer deleted successfully", null));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ApiResponse<>("ERROR", e.getMessage(), null));
-        }
+            return ResponseEntity.noContent().build();
     }
 } 
