@@ -1,7 +1,9 @@
 package com.oms.service;
 
 import com.oms.dto.CustomerDTO;
+import com.oms.dto.CreateCustomerRequest;
 import com.oms.entity.Customer;
+import com.oms.entity.CustomerTier;
 import com.oms.repository.CustomerRepository;
 import com.oms.service.impl.CustomerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +31,7 @@ class CustomerServiceTest {
     private CustomerServiceImpl customerService;
 
     private Customer testCustomer;
+    private CreateCustomerRequest testCreateRequest;
     private CustomerDTO testCustomerDTO;
 
     @BeforeEach
@@ -37,14 +40,20 @@ class CustomerServiceTest {
         testCustomer.setId(1L);
         testCustomer.setName("Test User");
         testCustomer.setEmail("test@example.com");
-        testCustomer.setTier(Customer.CustomerTier.REGULAR);
+        testCustomer.setTier(CustomerTier.REGULAR);
         testCustomer.setTotalOrders(0);
+
+        testCreateRequest = new CreateCustomerRequest(
+            "Test User",
+            "test@example.com",
+            CustomerTier.REGULAR
+        );
 
         testCustomerDTO = new CustomerDTO(
             1L,
             "Test User",
             "test@example.com",
-            Customer.CustomerTier.REGULAR,
+            CustomerTier.REGULAR,
             0
         );
     }
@@ -54,15 +63,15 @@ class CustomerServiceTest {
         when(customerRepository.existsByEmail(anyString())).thenReturn(false);
         when(customerRepository.save(any(Customer.class))).thenReturn(testCustomer);
 
-        CustomerDTO result = customerService.createCustomer(testCustomerDTO);
+        CustomerDTO result = customerService.createCustomer(testCreateRequest);
 
         assertNotNull(result);
-        assertEquals(testCustomerDTO.email(), result.email());
-        assertEquals(testCustomerDTO.name(), result.name());
-        assertEquals(Customer.CustomerTier.REGULAR, result.tier());
+        assertEquals(testCreateRequest.email(), result.email());
+        assertEquals(testCreateRequest.name(), result.name());
+        assertEquals(CustomerTier.REGULAR, result.tier());
         assertEquals(0, result.totalOrders());
 
-        verify(customerRepository).existsByEmail(testCustomerDTO.email());
+        verify(customerRepository).existsByEmail(testCreateRequest.email());
         verify(customerRepository).save(any(Customer.class));
     }
 
@@ -71,10 +80,10 @@ class CustomerServiceTest {
         when(customerRepository.existsByEmail(anyString())).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> 
-            customerService.createCustomer(testCustomerDTO)
+            customerService.createCustomer(testCreateRequest)
         );
 
-        verify(customerRepository).existsByEmail(testCustomerDTO.email());
+        verify(customerRepository).existsByEmail(testCreateRequest.email());
         verify(customerRepository, never()).save(any(Customer.class));
     }
 

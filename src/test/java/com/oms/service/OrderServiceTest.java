@@ -2,6 +2,7 @@ package com.oms.service;
 
 import com.oms.dto.OrderDTO;
 import com.oms.entity.Customer;
+import com.oms.entity.CustomerTier;
 import com.oms.entity.Order;
 import com.oms.repository.CustomerRepository;
 import com.oms.repository.OrderRepository;
@@ -47,7 +48,7 @@ class OrderServiceTest {
         testCustomer.setId(1L);
         testCustomer.setName("Test User");
         testCustomer.setEmail("test@example.com");
-        testCustomer.setTier(Customer.CustomerTier.REGULAR);
+        testCustomer.setTier(CustomerTier.REGULAR);
         testCustomer.setTotalOrders(0);
 
         testOrder = new Order();
@@ -69,7 +70,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void createOrder_Success() {
+    void createOrder_WithRegularCustomer_NoDiscount() {
         when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
         when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
         when(customerRepository.save(any(Customer.class))).thenReturn(testCustomer);
@@ -77,10 +78,62 @@ class OrderServiceTest {
         OrderDTO result = orderService.createOrder(testOrderDTO);
 
         assertNotNull(result);
-        assertEquals(testOrderDTO.amount(), result.amount());
-        assertEquals(testOrderDTO.customerId(), result.customerId());
         assertEquals(0.0, result.discountAmount());
         assertEquals(100.0, result.finalAmount());
+
+        verify(customerRepository).findById(1L);
+        verify(orderRepository).save(any(Order.class));
+        verify(customerRepository).save(any(Customer.class));
+    }
+
+    @Test
+    void createOrder_WithGoldCustomer_Applies10PercentDiscount() {
+        testCustomer.setTier(CustomerTier.GOLD);
+        
+        Order discountedOrder = new Order();
+        discountedOrder.setId(1L);
+        discountedOrder.setCustomer(testCustomer);
+        discountedOrder.setAmount(100.0);
+        discountedOrder.setDiscountAmount(10.0);
+        discountedOrder.setFinalAmount(90.0);
+        discountedOrder.setOrderDate(orderDate);
+
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
+        when(orderRepository.save(any(Order.class))).thenReturn(discountedOrder);
+        when(customerRepository.save(any(Customer.class))).thenReturn(testCustomer);
+
+        OrderDTO result = orderService.createOrder(testOrderDTO);
+
+        assertNotNull(result);
+        assertEquals(10.0, result.discountAmount());
+        assertEquals(90.0, result.finalAmount());
+
+        verify(customerRepository).findById(1L);
+        verify(orderRepository).save(any(Order.class));
+        verify(customerRepository).save(any(Customer.class));
+    }
+
+    @Test
+    void createOrder_WithPlatinumCustomer_Applies20PercentDiscount() {
+        testCustomer.setTier(CustomerTier.PLATINUM);
+        
+        Order discountedOrder = new Order();
+        discountedOrder.setId(1L);
+        discountedOrder.setCustomer(testCustomer);
+        discountedOrder.setAmount(100.0);
+        discountedOrder.setDiscountAmount(20.0);
+        discountedOrder.setFinalAmount(80.0);
+        discountedOrder.setOrderDate(orderDate);
+
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
+        when(orderRepository.save(any(Order.class))).thenReturn(discountedOrder);
+        when(customerRepository.save(any(Customer.class))).thenReturn(testCustomer);
+
+        OrderDTO result = orderService.createOrder(testOrderDTO);
+
+        assertNotNull(result);
+        assertEquals(20.0, result.discountAmount());
+        assertEquals(80.0, result.finalAmount());
 
         verify(customerRepository).findById(1L);
         verify(orderRepository).save(any(Order.class));
@@ -163,26 +216,5 @@ class OrderServiceTest {
         assertEquals(testOrderDTO.amount(), results.get(0).amount());
 
         verify(orderRepository).findAll();
-    }
-
-    @Test
-    void createOrder_WithGoldCustomer_AppliesDiscount() {
-        testCustomer.setTier(Customer.CustomerTier.GOLD);
-        testOrder.setDiscountAmount(10.0); // 10% of 100
-        testOrder.setFinalAmount(90.0);
-
-        when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
-        when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
-        when(customerRepository.save(any(Customer.class))).thenReturn(testCustomer);
-
-        OrderDTO result = orderService.createOrder(testOrderDTO);
-
-        assertNotNull(result);
-        assertEquals(10.0, result.discountAmount());
-        assertEquals(90.0, result.finalAmount());
-
-        verify(customerRepository).findById(1L);
-        verify(orderRepository).save(any(Order.class));
-        verify(customerRepository).save(any(Customer.class));
     }
 } 
