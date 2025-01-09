@@ -1,6 +1,7 @@
 package com.oms.controller;
 
 import com.oms.dto.CustomerDTO;
+import com.oms.dto.CreateCustomerRequest;
 import com.oms.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,8 +33,8 @@ public class CustomerController {
         @ApiResponse(responseCode = "400", description = "Invalid input or email already exists")
     })
     @PostMapping
-    public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody CustomerDTO customerDTO) {
-        CustomerDTO createdCustomer = customerService.createCustomer(customerDTO);
+    public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody CreateCustomerRequest request) {
+        CustomerDTO createdCustomer = customerService.createCustomer(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCustomer);
     }
 

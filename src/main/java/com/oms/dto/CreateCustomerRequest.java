@@ -4,9 +4,7 @@ import com.oms.entity.CustomerTier;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-public record CustomerDTO(
-    Long id,
-    
+public record CreateCustomerRequest(
     @NotBlank(message = "Name is required")
     String name,
     
@@ -14,12 +12,9 @@ public record CustomerDTO(
     @Email(message = "Invalid email format")
     String email,
     
-    CustomerTier tier,
-    
-    Integer totalOrders
+    CustomerTier tier
 ) {
-    public CustomerDTO {
+    public CreateCustomerRequest {
         if (tier == null) tier = CustomerTier.REGULAR;
-        if (totalOrders == null) totalOrders = 0;
     }
-} 
+}

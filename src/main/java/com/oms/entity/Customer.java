@@ -26,12 +26,6 @@ public class Customer {
 
     private Integer totalOrders = 0;
 
-    public enum CustomerTier {
-        REGULAR,
-        GOLD,
-        PLATINUM
-    }
-
     public void incrementTotalOrders() {
         this.totalOrders++;
         updateTier();
@@ -43,13 +37,5 @@ public class Customer {
         } else if (this.totalOrders >= 10) {
             this.tier = CustomerTier.GOLD;
         }
-    }
-
-    public double getDiscountPercentage() {
-        return switch (tier) {
-            case PLATINUM -> 0.20;
-            case GOLD -> 0.10;
-            case REGULAR -> 0.00;
-        };
     }
 } 
