@@ -31,9 +31,8 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setCustomer(customer);
         order.setAmount(orderDTO.amount());
-        order.setOrderDate(orderDTO.orderDate());
         
-        // Save order first to trigger @PrePersist
+        // The discount calculation happens automatically in Order.prePersist()
         order = orderRepository.save(order);
         
         // Update customer's order count and tier

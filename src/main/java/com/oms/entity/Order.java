@@ -1,8 +1,6 @@
 package com.oms.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -16,26 +14,37 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
-    @NotNull(message = "Customer is required")
     private Customer customer;
 
-    @NotNull(message = "Order amount is required")
-    @Positive(message = "Order amount must be positive")
+    @Column(nullable = false)
     private Double amount;
 
     private Double discountAmount;
 
     private Double finalAmount;
 
-    @Column(nullable = false)
-    private LocalDateTime orderDate = LocalDateTime.now();
+    private LocalDateTime orderDate;
 
     @PrePersist
-    public void calculateAmounts() {
-        if (customer != null && amount != null) {
-            double discountPercentage = customer.getDiscountPercentage();
-            this.discountAmount = amount * discountPercentage;
-            this.finalAmount = amount - discountAmount;
+    public void prePersist() {
+        if (orderDate == null) {
+            orderDate = LocalDateTime.now();
         }
+        calculateAmounts();
+    }
+
+    private void calculateAmounts() {
+        if (amount == null) {
+            amount = 0.0;
+        }
+        
+        // Get discount percentage from customer's tier
+        double discountPercentage = customer.getTier().getDiscountPercentage();
+        
+        // Calculate discount amount
+        discountAmount = amount * discountPercentage;
+        
+        // Calculate final amount after discount
+        finalAmount = amount - discountAmount;
     }
 } 
