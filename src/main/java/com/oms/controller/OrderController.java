@@ -33,15 +33,10 @@ public class OrderController {
         @ApiResponse(responseCode = "404", description = "Customer not found")
     })
     @PostMapping
-    public ResponseEntity<com.oms.response.ApiResponse<OrderDTO>> createOrder(
+    public ResponseEntity<OrderDTO> createOrder(
             @Valid @RequestBody OrderDTO orderDTO) {
-        try {
-            OrderDTO createdOrder = orderService.createOrder(orderDTO);
-            return ResponseEntity.ok(new com.oms.response.ApiResponse<>("SUCCESS", "Order created successfully", createdOrder));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                .body(new com.oms.response.ApiResponse<>("ERROR", e.getMessage(), null));
-        }
+        OrderDTO createdOrder = orderService.createOrder(orderDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
 
     @Operation(
@@ -53,15 +48,10 @@ public class OrderController {
         @ApiResponse(responseCode = "404", description = "Order not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<OrderDTO>> getOrderById(
+    public ResponseEntity<OrderDTO> getOrderById(
             @Parameter(description = "Order ID") @PathVariable Long id) {
-        try {
-            OrderDTO order = orderService.getOrderById(id);
-            return ResponseEntity.ok(new com.oms.response.ApiResponse<>("SUCCESS", "Order retrieved successfully", order));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new com.oms.response.ApiResponse<>("ERROR", e.getMessage(), null));
-        }
+        OrderDTO order = orderService.getOrderById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(order);
     }
 
     @Operation(
@@ -73,15 +63,10 @@ public class OrderController {
         @ApiResponse(responseCode = "404", description = "Customer not found")
     })
     @GetMapping("/customer/{customerId}")
-    public ResponseEntity<com.oms.response.ApiResponse<List<OrderDTO>>> getOrdersByCustomerId(
+    public ResponseEntity<List<OrderDTO>> getOrdersByCustomerId(
             @Parameter(description = "Customer ID") @PathVariable Long customerId) {
-        try {
-            List<OrderDTO> orders = orderService.getOrdersByCustomerId(customerId);
-            return ResponseEntity.ok(new com.oms.response.ApiResponse<>("SUCCESS", "Orders retrieved successfully", orders));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new com.oms.response.ApiResponse<>("ERROR", e.getMessage(), null));
-        }
+        List<OrderDTO> orders = orderService.getOrdersByCustomerId(customerId);
+        return ResponseEntity.status(HttpStatus.OK).body(orders);
     }
 
     @Operation(
@@ -90,8 +75,8 @@ public class OrderController {
     )
     @ApiResponse(responseCode = "200", description = "List of orders retrieved successfully")
     @GetMapping
-    public ResponseEntity<com.oms.response.ApiResponse<List<OrderDTO>>> getAllOrders() {
+    public ResponseEntity<List<OrderDTO>> getAllOrders() {
         List<OrderDTO> orders = orderService.getAllOrders();
-        return ResponseEntity.ok(new com.oms.response.ApiResponse<>("SUCCESS", "Orders retrieved successfully", orders));
+        return ResponseEntity.status(HttpStatus.OK).body(orders);
     }
 } 
