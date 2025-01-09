@@ -24,9 +24,8 @@ public class OpenAPIConfig {
             .description("Development server");
 
         Contact contact = new Contact()
-            .name("OMS Team")
-            .email("support@oms.com")
-            .url("https://www.oms.com");
+            .name("Melih Safa Çelik")
+            .email("melihsafa.c@gmail.com");
 
         License mitLicense = new License()
             .name("MIT License")
@@ -36,8 +35,7 @@ public class OpenAPIConfig {
             .title("Order Management System API")
             .version("1.0")
             .contact(contact)
-            .description("This API exposes endpoints for managing customers and orders.")
-            .termsOfService("https://www.oms.com/terms")
+            .description("This API exposes endpoints for Order Management System.")
             .license(mitLicense);
 
         return new OpenAPI()
