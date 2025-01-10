@@ -1,0 +1,76 @@
+package com.oms.util;
+
+import com.oms.dto.CreateCustomerRequest;
+import com.oms.dto.CustomerDTO;
+import com.oms.dto.OrderDTO;
+import com.oms.entity.Customer;
+import com.oms.entity.CustomerTier;
+import com.oms.entity.Order;
+
+import java.time.LocalDateTime;
+
+public class TestUtil {
+
+    // Customer builders
+    public static CreateCustomerRequest createCustomerRequest() {
+        return new CreateCustomerRequest(
+            "Test User",
+            "test@example.com",
+            CustomerTier.REGULAR
+        );
+    }
+
+    public static CustomerDTO customerDTO() {
+        return new CustomerDTO(
+            1L,
+            "Test User",
+            "test@example.com",
+            CustomerTier.REGULAR,
+            0
+        );
+    }
+
+    public static Customer customer() {
+        Customer customer = new Customer();
+        customer.setId(1L);
+        customer.setName("Test User");
+        customer.setEmail("test@example.com");
+        customer.setTier(CustomerTier.REGULAR);
+        customer.setTotalOrders(0);
+        return customer;
+    }
+
+    // Order builders
+    public static OrderDTO orderDTO(Long customerId) {
+        return new OrderDTO(
+            1L,
+            customerId,
+            100.0,
+            0.0,
+            100.0,
+            LocalDateTime.now()
+        );
+    }
+
+    public static OrderDTO orderDTOWithAmount(Long customerId, Double amount) {
+        return new OrderDTO(
+            1L,
+            customerId,
+            amount,
+            0.0,
+            amount,
+            LocalDateTime.now()
+        );
+    }
+
+    public static Order order(Customer customer) {
+        Order order = new Order();
+        order.setId(1L);
+        order.setCustomer(customer);
+        order.setAmount(100.0);
+        order.setDiscountAmount(0.0);
+        order.setFinalAmount(100.0);
+        order.setOrderDate(LocalDateTime.now());
+        return order;
+    }
+} 
