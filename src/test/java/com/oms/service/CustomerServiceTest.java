@@ -176,4 +176,76 @@ class CustomerServiceTest {
         verify(customerRepository).existsById(1L);
         verify(customerRepository, never()).deleteById(anyLong());
     }
+
+    @Test
+    void getCustomerByEmail_NotFound_ThrowsException() {
+        when(customerRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () ->
+            customerService.getCustomerByEmail("nonexistent@example.com")
+        );
+
+        verify(customerRepository).findByEmail(anyString());
+    }
+
+    @Test
+    void updateCustomer_WithExistingEmail_ThrowsException() {
+        Customer existingCustomer = new Customer();
+        existingCustomer.setId(2L);
+        existingCustomer.setEmail("existing@example.com");
+
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
+        when(customerRepository.existsByEmail("existing@example.com")).thenReturn(true);
+
+        CustomerDTO updateDTO = new CustomerDTO(
+            1L,
+            "Test User",
+            "existing@example.com",
+            CustomerTier.REGULAR,
+            0
+        );
+
+        assertThrows(IllegalArgumentException.class, () ->
+            customerService.updateCustomer(1L, updateDTO)
+        );
+
+        verify(customerRepository).findById(1L);
+        verify(customerRepository).existsByEmail("existing@example.com");
+        verify(customerRepository, never()).save(any(Customer.class));
+    }
+
+    @Test
+    void updateCustomer_CustomerNotFound_ThrowsException() {
+        when(customerRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () ->
+            customerService.updateCustomer(1L, testCustomerDTO)
+        );
+
+        verify(customerRepository).findById(1L);
+        verify(customerRepository, never()).save(any(Customer.class));
+    }
+
+    @Test
+    void updateCustomer_WithSameEmail_Success() {
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
+        when(customerRepository.save(any(Customer.class))).thenReturn(testCustomer);
+
+        CustomerDTO updateDTO = new CustomerDTO(
+            1L,
+            "Updated Name",
+            testCustomer.getEmail(),
+            CustomerTier.REGULAR,
+            0
+        );
+
+        CustomerDTO result = customerService.updateCustomer(1L, updateDTO);
+
+        assertNotNull(result);
+        assertEquals("Updated Name", result.name());
+        assertEquals(testCustomer.getEmail(), result.email());
+
+        verify(customerRepository).findById(1L);
+        verify(customerRepository).save(any(Customer.class));
+    }
 } 

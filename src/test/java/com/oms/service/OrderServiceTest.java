@@ -217,4 +217,136 @@ class OrderServiceTest {
 
         verify(orderRepository).findAll();
     }
+
+    @Test
+    void createOrder_WithZeroAmount_ThrowsException() {
+        OrderDTO zeroAmountOrder = new OrderDTO(
+            null,
+            1L,
+            0.0,
+            0.0,
+            0.0,
+            orderDate
+        );
+
+        assertThrows(IllegalArgumentException.class, () ->
+            orderService.createOrder(zeroAmountOrder)
+        );
+
+        verify(customerRepository, never()).findById(anyLong());
+        verify(orderRepository, never()).save(any(Order.class));
+    }
+
+    @Test
+    void createOrder_WithNegativeAmount_ThrowsException() {
+        OrderDTO negativeAmountOrder = new OrderDTO(
+            null,
+            1L,
+            -100.0,
+            0.0,
+            0.0,
+            orderDate
+        );
+
+        assertThrows(IllegalArgumentException.class, () ->
+            orderService.createOrder(negativeAmountOrder)
+        );
+
+        verify(customerRepository, never()).findById(anyLong());
+        verify(orderRepository, never()).save(any(Order.class));
+    }
+
+    @Test
+    void createOrder_UpdatesCustomerTierToGold() {
+        testCustomer.setTotalOrders(9); // One more order will make it 10 (GOLD)
+        
+        Order savedOrder = new Order();
+        savedOrder.setId(1L);
+        savedOrder.setCustomer(testCustomer);
+        savedOrder.setAmount(100.0);
+        savedOrder.setDiscountAmount(0.0); // First order still has no discount
+        savedOrder.setFinalAmount(100.0);
+        savedOrder.setOrderDate(orderDate);
+
+        Customer updatedCustomer = new Customer();
+        updatedCustomer.setId(1L);
+        updatedCustomer.setName("Test User");
+        updatedCustomer.setEmail("test@example.com");
+        updatedCustomer.setTier(CustomerTier.GOLD);
+        updatedCustomer.setTotalOrders(10);
+
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
+        when(orderRepository.save(any(Order.class))).thenReturn(savedOrder);
+        when(customerRepository.save(any(Customer.class))).thenReturn(updatedCustomer);
+
+        OrderDTO result = orderService.createOrder(testOrderDTO);
+
+        assertNotNull(result);
+        verify(customerRepository).findById(1L);
+        verify(orderRepository).save(any(Order.class));
+        verify(customerRepository).save(argThat(customer -> 
+            customer.getTotalOrders() == 10 && customer.getTier() == CustomerTier.GOLD
+        ));
+    }
+
+    @Test
+    void createOrder_UpdatesCustomerTierToPlatinum() {
+        testCustomer.setTotalOrders(19); // One more order will make it 20 (PLATINUM)
+        testCustomer.setTier(CustomerTier.GOLD);
+        
+        Order savedOrder = new Order();
+        savedOrder.setId(1L);
+        savedOrder.setCustomer(testCustomer);
+        savedOrder.setAmount(100.0);
+        savedOrder.setDiscountAmount(10.0); // Still GOLD tier discount for this order
+        savedOrder.setFinalAmount(90.0);
+        savedOrder.setOrderDate(orderDate);
+
+        Customer updatedCustomer = new Customer();
+        updatedCustomer.setId(1L);
+        updatedCustomer.setName("Test User");
+        updatedCustomer.setEmail("test@example.com");
+        updatedCustomer.setTier(CustomerTier.PLATINUM);
+        updatedCustomer.setTotalOrders(20);
+
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
+        when(orderRepository.save(any(Order.class))).thenReturn(savedOrder);
+        when(customerRepository.save(any(Customer.class))).thenReturn(updatedCustomer);
+
+        OrderDTO result = orderService.createOrder(testOrderDTO);
+
+        assertNotNull(result);
+        verify(customerRepository).findById(1L);
+        verify(orderRepository).save(any(Order.class));
+        verify(customerRepository).save(argThat(customer -> 
+            customer.getTotalOrders() == 20 && customer.getTier() == CustomerTier.PLATINUM
+        ));
+    }
+
+    @Test
+    void createOrder_SetsOrderDate() {
+        OrderDTO orderWithoutDate = new OrderDTO(
+            null,
+            1L,
+            100.0,
+            0.0,
+            100.0,
+            null
+        );
+
+        when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
+        when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
+        when(customerRepository.save(any(Customer.class))).thenReturn(testCustomer);
+
+        OrderDTO result = orderService.createOrder(orderWithoutDate);
+
+        assertNotNull(result);
+        assertNotNull(result.orderDate());
+        assertTrue(result.orderDate().isBefore(LocalDateTime.now().plusSeconds(1)));
+        assertTrue(result.orderDate().isAfter(LocalDateTime.now().minusMinutes(1)));
+
+        verify(customerRepository).findById(1L);
+        verify(orderRepository).save(any(Order.class));
+        verify(customerRepository).save(any(Customer.class));
+    }
 } 

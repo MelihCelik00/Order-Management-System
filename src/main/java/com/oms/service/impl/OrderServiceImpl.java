@@ -25,6 +25,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDTO createOrder(OrderDTO orderDTO) {
+        if (orderDTO.amount() <= 0) {
+            throw new IllegalArgumentException("Order amount must be greater than zero");
+        }
+
         Customer customer = customerRepository.findById(orderDTO.customerId())
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
         
