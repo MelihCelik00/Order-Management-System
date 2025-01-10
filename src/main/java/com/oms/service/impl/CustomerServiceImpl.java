@@ -2,6 +2,7 @@ package com.oms.service.impl;
 
 import com.oms.dto.CustomerDTO;
 import com.oms.dto.CreateCustomerRequest;
+import com.oms.dto.UpdateCustomerRequest;
 import com.oms.entity.Customer;
 import com.oms.repository.CustomerRepository;
 import com.oms.service.CustomerService;
@@ -66,17 +67,17 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public CustomerDTO updateCustomer(Long id, CustomerDTO customerDTO) {
+    public CustomerDTO updateCustomer(Long id, UpdateCustomerRequest request) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
         
-        if (!customer.getEmail().equals(customerDTO.email()) && 
-            customerRepository.existsByEmail(customerDTO.email())) {
+        if (!customer.getEmail().equals(request.email()) && 
+            customerRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Email already exists");
         }
         
-        customer.setName(customerDTO.name());
-        customer.setEmail(customerDTO.email());
+        customer.setName(request.name());
+        customer.setEmail(request.email());
         
         return toDTO(customerRepository.save(customer));
     }

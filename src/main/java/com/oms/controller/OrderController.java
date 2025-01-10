@@ -1,5 +1,6 @@
 package com.oms.controller;
 
+import com.oms.dto.CreateOrderRequest;
 import com.oms.dto.OrderDTO;
 import com.oms.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,14 +29,12 @@ public class OrderController {
         description = "Creates a new order for a customer with automatic discount application based on customer tier"
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Order created successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
-        @ApiResponse(responseCode = "404", description = "Customer not found")
+        @ApiResponse(responseCode = "201", description = "Order created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input or customer not found")
     })
     @PostMapping
-    public ResponseEntity<OrderDTO> createOrder(
-            @Valid @RequestBody OrderDTO orderDTO) {
-        OrderDTO createdOrder = orderService.createOrder(orderDTO);
+    public ResponseEntity<OrderDTO> createOrder(@Valid @RequestBody CreateOrderRequest request) {
+        OrderDTO createdOrder = orderService.createOrder(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
 
@@ -51,7 +50,7 @@ public class OrderController {
     public ResponseEntity<OrderDTO> getOrderById(
             @Parameter(description = "Order ID") @PathVariable Long id) {
         OrderDTO order = orderService.getOrderById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(order);
+        return ResponseEntity.ok(order);
     }
 
     @Operation(
@@ -66,7 +65,7 @@ public class OrderController {
     public ResponseEntity<List<OrderDTO>> getOrdersByCustomerId(
             @Parameter(description = "Customer ID") @PathVariable Long customerId) {
         List<OrderDTO> orders = orderService.getOrdersByCustomerId(customerId);
-        return ResponseEntity.status(HttpStatus.OK).body(orders);
+        return ResponseEntity.ok(orders);
     }
 
     @Operation(
@@ -77,6 +76,6 @@ public class OrderController {
     @GetMapping
     public ResponseEntity<List<OrderDTO>> getAllOrders() {
         List<OrderDTO> orders = orderService.getAllOrders();
-        return ResponseEntity.status(HttpStatus.OK).body(orders);
+        return ResponseEntity.ok(orders);
     }
 } 

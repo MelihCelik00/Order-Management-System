@@ -1,6 +1,7 @@
 package com.oms.util;
 
 import com.oms.dto.CreateCustomerRequest;
+import com.oms.dto.CreateOrderRequest;
 import com.oms.dto.CustomerDTO;
 import com.oms.dto.OrderDTO;
 import com.oms.entity.Customer;
@@ -41,6 +42,20 @@ public class TestUtil {
     }
 
     // Order builders
+    public static CreateOrderRequest createOrderRequest(Long customerId) {
+        return new CreateOrderRequest(
+            customerId,
+            100.0
+        );
+    }
+
+    public static CreateOrderRequest createOrderRequestWithAmount(Long customerId, Double amount) {
+        return new CreateOrderRequest(
+            customerId,
+            amount
+        );
+    }
+
     public static OrderDTO orderDTO(Long customerId) {
         return new OrderDTO(
             1L,

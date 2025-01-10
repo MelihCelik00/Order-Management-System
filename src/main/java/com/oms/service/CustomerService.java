@@ -2,6 +2,7 @@ package com.oms.service;
 
 import com.oms.dto.CustomerDTO;
 import com.oms.dto.CreateCustomerRequest;
+import com.oms.dto.UpdateCustomerRequest;
 import java.util.List;
 
 public interface CustomerService {
@@ -10,5 +11,5 @@ public interface CustomerService {
     CustomerDTO getCustomerByEmail(String email);
     List<CustomerDTO> getAllCustomers();
     void deleteCustomer(Long id);
-    CustomerDTO updateCustomer(Long id, CustomerDTO customerDTO);
+    CustomerDTO updateCustomer(Long id, UpdateCustomerRequest request);
 } 

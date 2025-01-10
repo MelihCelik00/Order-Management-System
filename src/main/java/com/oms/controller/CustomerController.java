@@ -2,6 +2,7 @@ package com.oms.controller;
 
 import com.oms.dto.CustomerDTO;
 import com.oms.dto.CreateCustomerRequest;
+import com.oms.dto.UpdateCustomerRequest;
 import com.oms.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,7 +30,7 @@ public class CustomerController {
         description = "Creates a new customer with the provided details. Email must be unique."
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Customer created successfully"),
+        @ApiResponse(responseCode = "201", description = "Customer created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid input or email already exists")
     })
     @PostMapping
@@ -50,8 +51,7 @@ public class CustomerController {
     public ResponseEntity<CustomerDTO> getCustomerById(
             @Parameter(description = "Customer ID") @PathVariable Long id) {
         CustomerDTO customer = customerService.getCustomerById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(customer);
-
+        return ResponseEntity.ok(customer);
     }
 
     @Operation(
@@ -66,7 +66,7 @@ public class CustomerController {
     public ResponseEntity<CustomerDTO> getCustomerByEmail(
             @Parameter(description = "Customer email") @PathVariable String email) {
         CustomerDTO customer = customerService.getCustomerByEmail(email);
-        return ResponseEntity.status(HttpStatus.OK).body(customer);
+        return ResponseEntity.ok(customer);
     }
 
     @Operation(
@@ -77,7 +77,7 @@ public class CustomerController {
     @GetMapping
     public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
         List<CustomerDTO> customers = customerService.getAllCustomers();
-        return ResponseEntity.status(HttpStatus.OK).body(customers);
+        return ResponseEntity.ok(customers);
     }
 
     @Operation(
@@ -92,10 +92,9 @@ public class CustomerController {
     @PutMapping("/{id}")
     public ResponseEntity<CustomerDTO> updateCustomer(
             @Parameter(description = "Customer ID") @PathVariable Long id,
-            @Valid @RequestBody CustomerDTO customerDTO) {
-
-            CustomerDTO updatedCustomer = customerService.updateCustomer(id, customerDTO);
-            return ResponseEntity.status(HttpStatus.OK).body(updatedCustomer);
+            @Valid @RequestBody UpdateCustomerRequest request) {
+        CustomerDTO updatedCustomer = customerService.updateCustomer(id, request);
+        return ResponseEntity.ok(updatedCustomer);
     }
 
     @Operation(
@@ -103,13 +102,13 @@ public class CustomerController {
         description = "Deletes a customer by their ID"
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Customer deleted successfully"),
+        @ApiResponse(responseCode = "204", description = "Customer deleted successfully"),
         @ApiResponse(responseCode = "404", description = "Customer not found")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(
             @Parameter(description = "Customer ID") @PathVariable Long id) {
-            customerService.deleteCustomer(id);
-            return ResponseEntity.noContent().build();
+        customerService.deleteCustomer(id);
+        return ResponseEntity.noContent().build();
     }
 } 
