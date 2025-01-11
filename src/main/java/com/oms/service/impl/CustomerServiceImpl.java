@@ -12,9 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
+    
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
     
     @Autowired
     private CustomerRepository customerRepository;
@@ -22,15 +25,28 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional
     public CustomerDTO createCustomer(CreateCustomerRequest request) {
+        if (request.name() == null || request.name().trim().isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be blank");
+        }
+        
+        if (request.email() == null || request.email().trim().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be blank");
+        }
+        
+        if (!EMAIL_PATTERN.matcher(request.email()).matches()) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+        
         if (customerRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Email already exists");
         }
         
-        Customer customer = new Customer();
-        customer.setName(request.name());
-        customer.setEmail(request.email());
-        customer.setTier(request.tier());
-        customer.setTotalOrders(0);
+        Customer customer = Customer.builder()
+            .name(request.name())
+            .email(request.email())
+            .tier(request.tier())
+            .totalOrders(0)
+            .build();
         
         return toDTO(customerRepository.save(customer));
     }
@@ -68,27 +84,44 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional
     public CustomerDTO updateCustomer(Long id, UpdateCustomerRequest request) {
-        Customer customer = customerRepository.findById(id)
+        if (request.name() == null || request.name().trim().isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be blank");
+        }
+        
+        if (request.email() == null || request.email().trim().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be blank");
+        }
+        
+        if (!EMAIL_PATTERN.matcher(request.email()).matches()) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+        
+        Customer existingCustomer = customerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
         
-        if (!customer.getEmail().equals(request.email()) && 
+        if (!existingCustomer.getEmail().equals(request.email()) && 
             customerRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Email already exists");
         }
         
-        customer.setName(request.name());
-        customer.setEmail(request.email());
+        Customer updatedCustomer = Customer.builder()
+            .id(existingCustomer.getId())
+            .name(request.name())
+            .email(request.email())
+            .tier(existingCustomer.getTier())
+            .totalOrders(existingCustomer.getTotalOrders())
+            .build();
         
-        return toDTO(customerRepository.save(customer));
+        return toDTO(customerRepository.save(updatedCustomer));
     }
 
     private CustomerDTO toDTO(Customer customer) {
-        return new CustomerDTO(
-            customer.getId(),
-            customer.getName(),
-            customer.getEmail(),
-            customer.getTier(),
-            customer.getTotalOrders()
-        );
+        return CustomerDTO.builder()
+            .id(customer.getId())
+            .name(customer.getName())
+            .email(customer.getEmail())
+            .tier(customer.getTier())
+            .totalOrders(customer.getTotalOrders())
+            .build();
     }
 } 

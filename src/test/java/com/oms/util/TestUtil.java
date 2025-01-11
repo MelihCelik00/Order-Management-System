@@ -32,13 +32,13 @@ public class TestUtil {
     }
 
     public static Customer customer() {
-        Customer customer = new Customer();
-        customer.setId(1L);
-        customer.setName("Test User");
-        customer.setEmail("test@example.com");
-        customer.setTier(CustomerTier.REGULAR);
-        customer.setTotalOrders(0);
-        return customer;
+        return Customer.builder()
+            .id(1L)
+            .name("Test User")
+            .email("test@example.com")
+            .tier(CustomerTier.REGULAR)
+            .totalOrders(0)
+            .build();
     }
 
     // Order builders

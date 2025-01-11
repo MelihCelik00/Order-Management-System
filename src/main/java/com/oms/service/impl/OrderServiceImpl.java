@@ -1,10 +1,13 @@
 package com.oms.service.impl;
 
+import com.oms.dto.CreateOrderRequest;
 import com.oms.dto.OrderDTO;
 import com.oms.entity.Customer;
+import com.oms.entity.CustomerTier;
 import com.oms.entity.Order;
 import com.oms.repository.CustomerRepository;
 import com.oms.repository.OrderRepository;
+import com.oms.service.NotificationService;
 import com.oms.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,26 +25,51 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @Override
     @Transactional
-    public OrderDTO createOrder(OrderDTO orderDTO) {
-        if (orderDTO.amount() <= 0) {
+    public OrderDTO createOrder(CreateOrderRequest request) {
+        if (request.customerId() == null) {
+            throw new IllegalArgumentException("Customer ID is required");
+        }
+        
+        if (request.amount() == null) {
+            throw new IllegalArgumentException("Amount is required");
+        }
+        
+        if (request.amount() <= 0) {
             throw new IllegalArgumentException("Order amount must be greater than zero");
         }
 
-        Customer customer = customerRepository.findById(orderDTO.customerId())
+        Customer customer = customerRepository.findById(request.customerId())
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
         
-        Order order = new Order();
-        order.setCustomer(customer);
-        order.setAmount(orderDTO.amount());
+        // Store the current tier for comparison
+        CustomerTier previousTier = customer.getTier();
+        
+        Order order = Order.builder()
+        .customer(customer)
+        .amount(request.amount())
+        .build();
         
         // The discount calculation happens automatically in Order.prePersist()
         order = orderRepository.save(order);
         
         // Update customer's order count and tier
         customer.incrementTotalOrders();
-        customerRepository.save(customer);
+        customer = customerRepository.save(customer);
+        
+        // Check if customer was upgraded to a new tier
+        if (previousTier != customer.getTier()) {
+            notificationService.sendTierUpgradeNotification(customer);
+        }
+        // Check if customer is close to next tier
+        else if ((previousTier == CustomerTier.REGULAR && customer.getTotalOrders() == 9) ||
+                 (previousTier == CustomerTier.GOLD && customer.getTotalOrders() == 19)) {
+            notificationService.sendTierProgressionAlert(customer, 1);
+        }
         
         return toDTO(order);
     }

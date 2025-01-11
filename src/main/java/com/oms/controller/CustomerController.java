@@ -47,7 +47,7 @@ public class CustomerController {
         @ApiResponse(responseCode = "200", description = "Customer found"),
         @ApiResponse(responseCode = "404", description = "Customer not found")
     })
-    @GetMapping("/{id}")
+    @GetMapping( value="/{id}")
     public ResponseEntity<CustomerDTO> getCustomerById(
             @Parameter(description = "Customer ID") @PathVariable Long id) {
         CustomerDTO customer = customerService.getCustomerById(id);

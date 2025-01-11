@@ -2,8 +2,10 @@ package com.oms.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Builder;
 import java.time.LocalDateTime;
 
+@Builder
 public record OrderDTO(
     Long id,
     
