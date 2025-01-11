@@ -3,10 +3,16 @@ package com.oms.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "customers")
 public class Customer {
     @Id
@@ -22,8 +28,10 @@ public class Customer {
     private String email;
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private CustomerTier tier = CustomerTier.REGULAR;
 
+    @Builder.Default
     private Integer totalOrders = 0;
 
     public void incrementTotalOrders() {
