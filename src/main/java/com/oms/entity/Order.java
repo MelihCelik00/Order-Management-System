@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 @Data
@@ -24,11 +26,11 @@ public class Order {
     private Customer customer;
 
     @Column(nullable = false)
-    private Double amount;
+    private BigDecimal amount;
 
-    private Double discountAmount;
+    private BigDecimal discountAmount;
 
-    private Double finalAmount;
+    private BigDecimal finalAmount;
 
     private LocalDateTime orderDate;
 
@@ -42,16 +44,16 @@ public class Order {
 
     private void calculateAmounts() {
         if (amount == null) {
-            amount = 0.0;
+            amount = BigDecimal.ZERO;
         }
         
         // Get discount percentage from customer's tier
-        double discountPercentage = customer.getTier().getDiscountPercentage();
+        BigDecimal discountPercentage = customer.getTier().getDiscountPercentage();
         
-        // Calculate discount amount
-        discountAmount = amount * discountPercentage;
+        // Calculate discount amount (rounded to 2 decimal places)
+        discountAmount = amount.multiply(discountPercentage).setScale(2, RoundingMode.HALF_UP);
         
         // Calculate final amount after discount
-        finalAmount = amount - discountAmount;
+        finalAmount = amount.subtract(discountAmount);
     }
 } 

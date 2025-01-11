@@ -1,17 +1,17 @@
 package com.oms.entity;
 
+import lombok.Getter;
+import java.math.BigDecimal;
+
+@Getter
 public enum CustomerTier {
-    REGULAR(0.00),
-    GOLD(0.10),
-    PLATINUM(0.20);
+    REGULAR(new BigDecimal("0.00")),
+    GOLD(new BigDecimal("0.10")),
+    PLATINUM(new BigDecimal("0.20"));
 
-    private final double discountPercentage;
+    private final BigDecimal discountPercentage;
 
-    CustomerTier(double discountPercentage) {
+    CustomerTier(BigDecimal discountPercentage) {
         this.discountPercentage = discountPercentage;
     }
-
-    public double getDiscountPercentage() {
-        return discountPercentage;
-    }
-} 
+}

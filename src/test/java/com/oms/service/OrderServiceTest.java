@@ -8,6 +8,7 @@ import com.oms.entity.Order;
 import com.oms.repository.CustomerRepository;
 import com.oms.repository.OrderRepository;
 import com.oms.service.impl.OrderServiceImpl;
+import com.oms.util.TestUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,11 +16,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.oms.util.TestUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -60,21 +63,23 @@ class OrderServiceTest {
         testOrder = Order.builder()
             .id(1L)
             .customer(testCustomer)
-            .amount(100.0)
-            .discountAmount(0.0)
-            .finalAmount(100.0)
+            .amount(AMOUNT_100)
+            .discountAmount(BigDecimal.ZERO)
+            .finalAmount(AMOUNT_100)
             .orderDate(LocalDateTime.now())
             .build();
 
         testCreateRequest = CreateOrderRequest.builder()
             .customerId(1L)
-            .amount(100.0)
+            .amount(AMOUNT_100)
             .build();
 
         testOrderDTO = OrderDTO.builder()
             .id(1L)
             .customerId(1L)
-            .amount(100.0)
+            .amount(AMOUNT_100)
+            .discountAmount(BigDecimal.ZERO)
+            .finalAmount(AMOUNT_100)
             .orderDate(LocalDateTime.now())
             .build();
     }
@@ -90,8 +95,8 @@ class OrderServiceTest {
         assertNotNull(result);
         assertEquals(testCreateRequest.amount(), result.amount());
         assertEquals(testCreateRequest.customerId(), result.customerId());
-        assertEquals(0.0, result.discountAmount());
-        assertEquals(100.0, result.finalAmount());
+        assertEquals(BigDecimal.ZERO, result.discountAmount());
+        assertEquals(AMOUNT_100, result.finalAmount());
 
         verify(customerRepository).findById(1L);
         verify(orderRepository).save(any(Order.class));
@@ -111,7 +116,7 @@ class OrderServiceTest {
     void createOrder_WithZeroAmount_ThrowsException() {
         CreateOrderRequest zeroAmountRequest = CreateOrderRequest.builder()
             .customerId(1L)
-            .amount(0.0)
+            .amount(BigDecimal.ZERO)
             .build();
 
         assertThrows(IllegalArgumentException.class, () ->
@@ -123,7 +128,7 @@ class OrderServiceTest {
     void createOrder_WithNegativeAmount_ThrowsException() {
         CreateOrderRequest negativeAmountRequest = CreateOrderRequest.builder()
             .customerId(1L)
-            .amount(-100.0)
+            .amount(new BigDecimal("-100.00"))
             .build();
 
         assertThrows(IllegalArgumentException.class, () ->
@@ -253,7 +258,7 @@ class OrderServiceTest {
 
     @Test
     void createOrder_SetsOrderDate() {
-        CreateOrderRequest request = new CreateOrderRequest(1L, 100.0);
+        CreateOrderRequest request = new CreateOrderRequest(1L, AMOUNT_100);
         
         when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
         when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
@@ -278,9 +283,9 @@ class OrderServiceTest {
         Order savedOrder = Order.builder()
             .id(1L)
             .customer(testCustomer)
-            .amount(100.0)
-            .discountAmount(0.0)
-            .finalAmount(100.0)
+            .amount(AMOUNT_100)
+            .discountAmount(BigDecimal.ZERO)
+            .finalAmount(AMOUNT_100)
             .orderDate(orderDate)
             .build();
             
@@ -290,8 +295,8 @@ class OrderServiceTest {
         OrderDTO result = orderService.createOrder(testCreateRequest);
 
         assertNotNull(result);
-        assertEquals(0.0, result.discountAmount());
-        assertEquals(100.0, result.finalAmount());
+        assertEquals(BigDecimal.ZERO, result.discountAmount());
+        assertEquals(AMOUNT_100, result.finalAmount());
     }
 
     @Test
@@ -302,9 +307,9 @@ class OrderServiceTest {
         Order savedOrder = Order.builder()
             .id(1L)
             .customer(testCustomer)
-            .amount(100.0)
-            .discountAmount(10.0)
-            .finalAmount(90.0)
+            .amount(AMOUNT_100)
+            .discountAmount(calculateDiscountAmount(AMOUNT_100, CustomerTier.GOLD))
+            .finalAmount(calculateFinalAmount(AMOUNT_100, CustomerTier.GOLD))
             .orderDate(orderDate)
             .build();
             
@@ -314,8 +319,8 @@ class OrderServiceTest {
         OrderDTO result = orderService.createOrder(testCreateRequest);
 
         assertNotNull(result);
-        assertEquals(10.0, result.discountAmount());
-        assertEquals(90.0, result.finalAmount());
+        assertEquals(calculateDiscountAmount(AMOUNT_100, CustomerTier.GOLD), result.discountAmount());
+        assertEquals(calculateFinalAmount(AMOUNT_100, CustomerTier.GOLD), result.finalAmount());
     }
 
     @Test
@@ -326,9 +331,9 @@ class OrderServiceTest {
         Order savedOrder = Order.builder()
             .id(1L)
             .customer(testCustomer)
-            .amount(100.0)
-            .discountAmount(20.0)
-            .finalAmount(80.0)
+            .amount(AMOUNT_100)
+            .discountAmount(calculateDiscountAmount(AMOUNT_100, CustomerTier.PLATINUM))
+            .finalAmount(calculateFinalAmount(AMOUNT_100, CustomerTier.PLATINUM))
             .orderDate(orderDate)
             .build();
             
@@ -338,8 +343,8 @@ class OrderServiceTest {
         OrderDTO result = orderService.createOrder(testCreateRequest);
 
         assertNotNull(result);
-        assertEquals(20.0, result.discountAmount());
-        assertEquals(80.0, result.finalAmount());
+        assertEquals(calculateDiscountAmount(AMOUNT_100, CustomerTier.PLATINUM), result.discountAmount());
+        assertEquals(calculateFinalAmount(AMOUNT_100, CustomerTier.PLATINUM), result.finalAmount());
     }
 
     @Test
@@ -390,7 +395,7 @@ class OrderServiceTest {
 
     @Test
     void createOrder_WithMaximumAmount() {
-        double maxAmount = Double.MAX_VALUE;
+        BigDecimal maxAmount = BigDecimal.valueOf(Double.MAX_VALUE);
         CreateOrderRequest maxRequest = new CreateOrderRequest(1L, maxAmount);
         
         when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
@@ -399,7 +404,7 @@ class OrderServiceTest {
             .id(1L)
             .customer(testCustomer)
             .amount(maxAmount)
-            .discountAmount(0.0)
+            .discountAmount(BigDecimal.ZERO)
             .finalAmount(maxAmount)
             .orderDate(orderDate)
             .build();
@@ -415,17 +420,19 @@ class OrderServiceTest {
 
     @Test
     void createOrder_WithMinimumAmount() {
-        double minAmount = 0.01;
-        CreateOrderRequest minRequest = new CreateOrderRequest(1L, minAmount);
+        CreateOrderRequest minRequest = CreateOrderRequest.builder()
+            .customerId(1L)
+            .amount(AMOUNT_MIN)
+            .build();
         
         when(customerRepository.findById(1L)).thenReturn(Optional.of(testCustomer));
         
         Order savedOrder = Order.builder()
             .id(1L)
             .customer(testCustomer)
-            .amount(minAmount)
-            .discountAmount(0.0)
-            .finalAmount(minAmount)
+            .amount(AMOUNT_MIN)
+            .discountAmount(BigDecimal.ZERO)
+            .finalAmount(AMOUNT_MIN)
             .orderDate(orderDate)
             .build();
             
@@ -435,14 +442,14 @@ class OrderServiceTest {
         OrderDTO result = orderService.createOrder(minRequest);
 
         assertNotNull(result);
-        assertEquals(minAmount, result.amount());
+        assertEquals(AMOUNT_MIN, result.amount());
     }
 
     @Test
     void createOrder_WithNullCustomerId_ThrowsException() {
         CreateOrderRequest invalidRequest = CreateOrderRequest.builder()
             .customerId(null)
-            .amount(100.0)
+            .amount(new BigDecimal("100.00"))
             .build();
 
         assertThrows(IllegalArgumentException.class, () ->

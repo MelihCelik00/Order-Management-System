@@ -3,6 +3,7 @@ package com.oms.dto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Builder;
+import java.math.BigDecimal;
 
 @Builder
 public record CreateOrderRequest(
@@ -11,5 +12,5 @@ public record CreateOrderRequest(
     
     @NotNull(message = "Amount is required")
     @Positive(message = "Amount must be positive")
-    Double amount
+    BigDecimal amount
 ) {} 

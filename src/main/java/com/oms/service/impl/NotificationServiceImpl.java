@@ -7,10 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 public class NotificationServiceImpl implements NotificationService {
     
     private static final Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
+    private static final BigDecimal HUNDRED = new BigDecimal("100");
 
     @Override
     public void sendTierProgressionAlert(Customer customer, int ordersToNextTier) {
@@ -22,7 +25,7 @@ public class NotificationServiceImpl implements NotificationService {
             ordersToNextTier,
             ordersToNextTier == 1 ? "" : "s",
             nextTier,
-            nextTier.getDiscountPercentage() * 100
+            nextTier.getDiscountPercentage().multiply(HUNDRED).doubleValue()
         );
         
         sendEmail(customer.getEmail(), "Almost there! You're close to a tier upgrade!", message);
@@ -34,7 +37,7 @@ public class NotificationServiceImpl implements NotificationService {
             "Congratulations %s! You have been upgraded to %s tier. You now enjoy a %.0f%% discount on all your orders!",
             customer.getName(),
             customer.getTier(),
-            customer.getTier().getDiscountPercentage() * 100
+            customer.getTier().getDiscountPercentage().multiply(HUNDRED).doubleValue()
         );
         
         sendEmail(customer.getEmail(), "Congratulations on Your Tier Upgrade!", message);

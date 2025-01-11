@@ -8,9 +8,23 @@ import com.oms.entity.Customer;
 import com.oms.entity.CustomerTier;
 import com.oms.entity.Order;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 public class TestUtil {
+    // Constants
+    public static final BigDecimal AMOUNT_100 = new BigDecimal("100.00");
+    public static final BigDecimal AMOUNT_MIN = new BigDecimal("0.01");
+
+    // Helper methods for calculating discounts
+    public static BigDecimal calculateDiscountAmount(BigDecimal amount, CustomerTier tier) {
+        return amount.multiply(tier.getDiscountPercentage()).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    public static BigDecimal calculateFinalAmount(BigDecimal amount, CustomerTier tier) {
+        return amount.subtract(calculateDiscountAmount(amount, tier));
+    }
 
     // Customer builders
     public static CreateCustomerRequest createCustomerRequest() {
@@ -45,11 +59,11 @@ public class TestUtil {
     public static CreateOrderRequest createOrderRequest(Long customerId) {
         return new CreateOrderRequest(
             customerId,
-            100.0
+            AMOUNT_100
         );
     }
 
-    public static CreateOrderRequest createOrderRequestWithAmount(Long customerId, Double amount) {
+    public static CreateOrderRequest createOrderRequestWithAmount(Long customerId, BigDecimal amount) {
         return new CreateOrderRequest(
             customerId,
             amount
@@ -60,19 +74,19 @@ public class TestUtil {
         return new OrderDTO(
             1L,
             customerId,
-            100.0,
-            0.0,
-            100.0,
+            AMOUNT_100,
+            BigDecimal.ZERO,
+            AMOUNT_100,
             LocalDateTime.now()
         );
     }
 
-    public static OrderDTO orderDTOWithAmount(Long customerId, Double amount) {
+    public static OrderDTO orderDTOWithAmount(Long customerId, BigDecimal amount) {
         return new OrderDTO(
             1L,
             customerId,
             amount,
-            0.0,
+            BigDecimal.ZERO,
             amount,
             LocalDateTime.now()
         );
@@ -82,9 +96,9 @@ public class TestUtil {
         Order order = new Order();
         order.setId(1L);
         order.setCustomer(customer);
-        order.setAmount(100.0);
-        order.setDiscountAmount(0.0);
-        order.setFinalAmount(100.0);
+        order.setAmount(AMOUNT_100);
+        order.setDiscountAmount(BigDecimal.ZERO);
+        order.setFinalAmount(AMOUNT_100);
         order.setOrderDate(LocalDateTime.now());
         return order;
     }
