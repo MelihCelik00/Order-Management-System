@@ -96,6 +96,7 @@ GET    /api/orders/customer/{customerId} - Get orders by customer ID
 - [x] Created CustomerDTO for data transfer
 - [x] Created OrderDTO for data transfer
 - [x] Implemented validation constraints
+- [x] Implemented builder pattern for all DTOs
 
 ### 4. Repository Layer
 - [x] Created CustomerRepository with custom queries
@@ -106,12 +107,14 @@ GET    /api/orders/customer/{customerId} - Get orders by customer ID
 - [x] Implemented OrderService interface and implementation
 - [x] Added business logic for tier progression
 - [x] Added automatic discount calculation
+- [x] Implemented proper validation handling
 
 ### 6. Controller Layer
 - [x] Implemented CustomerController with CRUD operations
 - [x] Implemented OrderController with order management
 - [x] Added proper error handling
 - [x] Implemented response wrapping with ApiResponse
+- [x] Added request validation using @Valid
 
 ### 7. Documentation
 - [x] Created initial documentation
@@ -120,13 +123,12 @@ GET    /api/orders/customer/{customerId} - Get orders by customer ID
 - [x] Listed completed tasks
 
 ### 8. Testing
-- [x] Added test dependencies (JUnit, Mockito, H2)
-- [x] Created test configuration with H2 database
+- [x] Added test dependencies (JUnit, Mockito)
 - [x] Implemented CustomerService unit tests
 - [x] Implemented OrderService unit tests
-- [x] Tested customer tier progression
-- [x] Tested discount calculation
-- [x] Tested error scenarios
+- [x] Implemented builder pattern in test data creation
+- [x] Added comprehensive test coverage for edge cases
+- [x] Optimized test structure and removed redundant validations
 
 ### 9. API Documentation
 - [x] Added SpringDoc OpenAPI dependency
@@ -150,6 +152,9 @@ http://localhost:8080/v3/api-docs
 - [ ] Add logging
 - [ ] Implement security
 - [ ] Add monitoring and metrics
+- [ ] Add integration tests
+- [ ] Implement caching
+- [ ] Add rate limiting
 
 ## Test Coverage
 
@@ -161,6 +166,8 @@ http://localhost:8080/v3/api-docs
 - Update customer
 - Delete customer
 - Email uniqueness validation
+- Input validation using @Valid
+- Builder pattern implementation
 
 ### OrderService Tests
 - Create order (success and failure scenarios)
@@ -168,4 +175,9 @@ http://localhost:8080/v3/api-docs
 - Get orders by customer ID
 - Get all orders
 - Discount calculation for different customer tiers
-- Customer tier progression after order creation 
+- Customer tier progression after order creation
+- Edge cases (maximum/minimum amounts)
+- Tier upgrade notifications
+- Tier progression alerts
+- Input validation using @Valid
+- Builder pattern implementation 

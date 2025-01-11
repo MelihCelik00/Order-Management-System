@@ -34,6 +34,16 @@ public class Customer {
     @Builder.Default
     private Integer totalOrders = 0;
 
+    @PrePersist
+    public void prePersist() {
+        if (tier == null) {
+            tier = CustomerTier.REGULAR;
+        }
+        if (totalOrders == null) {
+            totalOrders = 0;
+        }
+    }
+
     public void incrementTotalOrders() {
         this.totalOrders++;
         updateTier();

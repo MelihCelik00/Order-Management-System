@@ -44,7 +44,6 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = Customer.builder()
             .name(request.name())
             .email(request.email())
-            .tier(request.tier())
             .totalOrders(0)
             .build();
         
