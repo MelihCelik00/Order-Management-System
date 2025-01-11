@@ -1,24 +1,25 @@
 package com.oms.controller;
 
-import com.oms.dto.CustomerDTO;
+import com.oms.config.ApiEndpoints;
 import com.oms.dto.CreateCustomerRequest;
+import com.oms.dto.CustomerDTO;
 import com.oms.dto.UpdateCustomerRequest;
 import com.oms.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/customers")
+@RequestMapping(ApiEndpoints.CUSTOMERS)
 @Tag(name = "Customer Management", description = "APIs for managing customers")
 public class CustomerController {
     
@@ -33,8 +34,9 @@ public class CustomerController {
         @ApiResponse(responseCode = "201", description = "Customer created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid input or email already exists")
     })
-    @PostMapping
-    public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody CreateCustomerRequest request) {
+    @PostMapping(ApiEndpoints.Customer.CREATE)
+    public ResponseEntity<CustomerDTO> createCustomer(
+            @Parameter(description = "Customer details") @Valid @RequestBody CreateCustomerRequest request) {
         CustomerDTO createdCustomer = customerService.createCustomer(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCustomer);
     }
@@ -47,11 +49,10 @@ public class CustomerController {
         @ApiResponse(responseCode = "200", description = "Customer found"),
         @ApiResponse(responseCode = "404", description = "Customer not found")
     })
-    @GetMapping( value="/{id}")
+    @GetMapping(ApiEndpoints.Customer.GET_BY_ID)
     public ResponseEntity<CustomerDTO> getCustomerById(
             @Parameter(description = "Customer ID") @PathVariable Long id) {
-        CustomerDTO customer = customerService.getCustomerById(id);
-        return ResponseEntity.ok(customer);
+        return ResponseEntity.ok(customerService.getCustomerById(id));
     }
 
     @Operation(
@@ -62,22 +63,20 @@ public class CustomerController {
         @ApiResponse(responseCode = "200", description = "Customer found"),
         @ApiResponse(responseCode = "404", description = "Customer not found")
     })
-    @GetMapping("/email/{email}")
+    @GetMapping(ApiEndpoints.Customer.GET_BY_EMAIL)
     public ResponseEntity<CustomerDTO> getCustomerByEmail(
             @Parameter(description = "Customer email") @PathVariable String email) {
-        CustomerDTO customer = customerService.getCustomerByEmail(email);
-        return ResponseEntity.ok(customer);
+        return ResponseEntity.ok(customerService.getCustomerByEmail(email));
     }
 
     @Operation(
         summary = "Get all customers",
-        description = "Retrieves a list of all customers"
+        description = "Retrieves a list of all customers in the system"
     )
     @ApiResponse(responseCode = "200", description = "List of customers retrieved successfully")
-    @GetMapping
+    @GetMapping(ApiEndpoints.Customer.GET_ALL)
     public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
-        List<CustomerDTO> customers = customerService.getAllCustomers();
-        return ResponseEntity.ok(customers);
+        return ResponseEntity.ok(customerService.getAllCustomers());
     }
 
     @Operation(
@@ -89,12 +88,11 @@ public class CustomerController {
         @ApiResponse(responseCode = "400", description = "Invalid input or email already exists"),
         @ApiResponse(responseCode = "404", description = "Customer not found")
     })
-    @PutMapping("/{id}")
+    @PutMapping(ApiEndpoints.Customer.UPDATE)
     public ResponseEntity<CustomerDTO> updateCustomer(
             @Parameter(description = "Customer ID") @PathVariable Long id,
-            @Valid @RequestBody UpdateCustomerRequest request) {
-        CustomerDTO updatedCustomer = customerService.updateCustomer(id, request);
-        return ResponseEntity.ok(updatedCustomer);
+            @Parameter(description = "Updated customer details") @Valid @RequestBody UpdateCustomerRequest request) {
+        return ResponseEntity.ok(customerService.updateCustomer(id, request));
     }
 
     @Operation(
@@ -105,7 +103,7 @@ public class CustomerController {
         @ApiResponse(responseCode = "204", description = "Customer deleted successfully"),
         @ApiResponse(responseCode = "404", description = "Customer not found")
     })
-    @DeleteMapping("/{id}")
+    @DeleteMapping(ApiEndpoints.Customer.DELETE)
     public ResponseEntity<Void> deleteCustomer(
             @Parameter(description = "Customer ID") @PathVariable Long id) {
         customerService.deleteCustomer(id);
