@@ -54,11 +54,10 @@ A Spring Boot application that manages customer orders with a tiered discount sy
 
 #### Notification Examples
 ![Notification 1](docs/images/close-to-tier-upgrade-notification.png)
-*Push notification sent to the customers that are close to a tier upgrade.*
+*Push notification sent to customers who are close to a tier upgrade.*
 
-#### 
 ![Notification 2](docs/images/tier-upgrade-notification.png)
-*Notification sent to customer that are just have their tier upgraded.*
+*Notification sent to customers who have just had their tier upgraded.*
 
 ## Tech Stack
 
@@ -183,6 +182,7 @@ src/
   - 3 different service could have been implemented (customer-service, order-service and notification-service)
   - Kafka would be the choice for handling event messages. For contracts, schema registry might be used for consistency
 - Integration tests for controllers
+- Increasing the total test coverage (currently ~70%)
 - Logging (Elasticsearch, Logstash, Kibana)
 - Security (OAuth2, JWT, Keycloak)
 - Kubernetes (Could be used after DDD implementation)
@@ -190,3 +190,16 @@ src/
 - Monitoring and metrics (New relic)
 - Health checks
 - Environment variables (Rather than .env)
+
+### Tried, Denied or Failed Ideas
+- **DDD Concept Implementation with multiple microservices**
+  - Initially developed a monolithic application which is still the case, and then tried to migrate my project into a more distributed architecture.
+  - Migration was not successful at the end since the planning about this improvement not planned at first, hence it got more difficult to implement in a short time period.
+  - After this failed attempt, reverted changes into a monolithic architecture again, and tried to implement it at its best.
+- Another idea was implementing the Customer Tier logic.
+  - First of all, implement it as enum in the customer class but it has association with order class.
+  - Then, I thought about implementing it as a separate table in the database but it would be a waste of space since it has only 3 values and unnecessary to create a new table in terms of a monolithic application.
+  - Finally, I decided to implement it as a separate enum entity.
+- Used H2 in-memory database at first but then switched to PostgreSQL.
+  - H2 was not a good choice for a production environment since it is an in-memory database and it didnt make sense to use it as a relational database.
+  - PostgreSQL was a good choice for a potential production environment since it is a relational database and it is suitable for a distributed environment.
