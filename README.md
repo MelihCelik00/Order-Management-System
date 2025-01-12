@@ -55,10 +55,12 @@ A Spring Boot application that manages customer orders with a tiered discount sy
 
 #### Order Table
 ![Order Table](docs/images/orders-table-with-discounts.png)
+
 *Orders table with discount applied orders*
 
 #### Swagger API Documentation
 ![Swagger API Overview](docs/images/swagger-apis.png)
+
 *OpenAPI documentation showing all available endpoints*
 
 #### Swagger Schemas
