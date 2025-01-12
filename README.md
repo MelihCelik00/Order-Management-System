@@ -46,32 +46,30 @@ A Spring Boot application that manages customer orders with a tiered discount sy
 ![Database Login](docs/images/adminer-login.png)
 
 #### PostgreSQL Database Structure in Adminer
-![Database Structure](docs/images/oms-db-tables.png)
+![Database Structure](docs/images/oms-db-tables.png)  
 *PostgreSQL database structure showing Customer and Order tables in Adminer*
 
 #### Customer Table
-![Customer Table](docs/images/customers-table.png)
-
+![Customer Table](docs/images/customers-table.png)  
 *Customer table with 3 customers as example*
 
 #### Order Table
-![Order Table](docs/images/orders-table-with-discounts.png)
-
+![Order Table](docs/images/orders-table-with-discounts.png)  
 *Orders table with discount applied orders*
 
 #### Swagger API Documentation
-![Swagger API Overview](docs/images/swagger-apis.png)
+![Swagger API Overview](docs/images/swagger-apis.png)  
 *OpenAPI documentation showing all available endpoints*
 
 #### Swagger Schemas
-![Swagger Schemas](docs/images/swagger-api-schemas.png)
+![Swagger Schemas](docs/images/swagger-api-schemas.png)  
 *Overview of used schemas in swagger*
 
 #### Notification Examples
-![Notification 1](docs/images/close-to-tier-upgrade-notification.png)
+![Notification 1](docs/images/close-to-tier-upgrade-notification.png)  
 *Push notification sent to customers who are close to a tier upgrade.*
 
-![Notification 2](docs/images/tier-upgrade-notification.png)
+![Notification 2](docs/images/tier-upgrade-notification.png)  
 *Notification sent to customers who have just had their tier upgraded.*
 
 ## Tech Stack
