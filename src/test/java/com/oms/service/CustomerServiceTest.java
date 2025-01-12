@@ -7,6 +7,7 @@ import com.oms.entity.Customer;
 import com.oms.entity.CustomerTier;
 import com.oms.repository.CustomerRepository;
 import com.oms.service.impl.CustomerServiceImpl;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -109,7 +110,7 @@ class CustomerServiceTest {
     void getCustomerById_NotFound_ThrowsException() {
         when(customerRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> 
+        assertThrows(EntityNotFoundException.class, () ->
             customerService.getCustomerById(1L)
         );
     }
@@ -186,7 +187,7 @@ class CustomerServiceTest {
     void deleteCustomer_NotFound_ThrowsException() {
         when(customerRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> 
+        assertThrows(EntityNotFoundException.class, () ->
             customerService.deleteCustomer(1L)
         );
     }
@@ -195,7 +196,7 @@ class CustomerServiceTest {
     void getCustomerByEmail_NotFound_ThrowsException() {
         when(customerRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThrows(EntityNotFoundException.class, () ->
             customerService.getCustomerByEmail("nonexistent@example.com")
         );
     }
@@ -224,7 +225,7 @@ class CustomerServiceTest {
             testCustomer.getEmail()
         );
 
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThrows(EntityNotFoundException.class, () ->
             customerService.updateCustomer(1L, updateRequest)
         );
     }

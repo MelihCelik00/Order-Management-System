@@ -6,6 +6,7 @@ import com.oms.dto.UpdateCustomerRequest;
 import com.oms.entity.Customer;
 import com.oms.repository.CustomerRepository;
 import com.oms.service.CustomerService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,14 +55,14 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerDTO getCustomerById(Long id) {
         return customerRepository.findById(id)
                 .map(this::toDTO)
-                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found"));
     }
 
     @Override
     public CustomerDTO getCustomerByEmail(String email) {
         return customerRepository.findByEmail(email)
                 .map(this::toDTO)
-                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found"));
     }
 
     @Override
@@ -75,7 +76,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional
     public void deleteCustomer(Long id) {
         if (!customerRepository.existsById(id)) {
-            throw new IllegalArgumentException("Customer not found");
+            throw new EntityNotFoundException("Customer not found");
         }
         customerRepository.deleteById(id);
     }
@@ -96,7 +97,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
         
         Customer existingCustomer = customerRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found"));
         
         if (!existingCustomer.getEmail().equals(request.email()) && 
             customerRepository.existsByEmail(request.email())) {
