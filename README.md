@@ -51,6 +51,7 @@ A Spring Boot application that manages customer orders with a tiered discount sy
 
 #### Customer Table
 ![Customer Table](docs/images/customers-table.png)
+
 *Customer table with 3 customers as example*
 
 #### Order Table
@@ -60,7 +61,6 @@ A Spring Boot application that manages customer orders with a tiered discount sy
 
 #### Swagger API Documentation
 ![Swagger API Overview](docs/images/swagger-apis.png)
-
 *OpenAPI documentation showing all available endpoints*
 
 #### Swagger Schemas
