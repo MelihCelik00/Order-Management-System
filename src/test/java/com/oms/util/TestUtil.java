@@ -13,11 +13,9 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 public class TestUtil {
-    // Constants
     public static final BigDecimal AMOUNT_100 = new BigDecimal("100.00");
     public static final BigDecimal AMOUNT_MIN = new BigDecimal("0.01");
 
-    // Helper methods for calculating discounts
     public static BigDecimal calculateDiscountAmount(BigDecimal amount, CustomerTier tier) {
         return amount.multiply(tier.getDiscountPercentage()).setScale(2, RoundingMode.HALF_UP);
     }
@@ -26,7 +24,6 @@ public class TestUtil {
         return amount.subtract(calculateDiscountAmount(amount, tier));
     }
 
-    // Customer builders
     public static CreateCustomerRequest createCustomerRequest() {
         return new CreateCustomerRequest(
             "Test User",
@@ -55,7 +52,6 @@ public class TestUtil {
             .build();
     }
 
-    // Order builders
     public static CreateOrderRequest createOrderRequest(Long customerId) {
         return new CreateOrderRequest(
             customerId,
