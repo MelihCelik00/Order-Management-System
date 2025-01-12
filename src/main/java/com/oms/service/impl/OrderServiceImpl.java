@@ -9,6 +9,7 @@ import com.oms.repository.CustomerRepository;
 import com.oms.repository.OrderRepository;
 import com.oms.service.NotificationService;
 import com.oms.service.OrderService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Customer customer = customerRepository.findById(request.customerId())
-                .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found"));
         
         // Store the current tier for comparison
         CustomerTier previousTier = customer.getTier();
@@ -79,13 +80,13 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO getOrderById(Long id) {
         return orderRepository.findById(id)
                 .map(this::toDTO)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Order not found"));
     }
 
     @Override
     public List<OrderDTO> getOrdersByCustomerId(Long customerId) {
         if (!customerRepository.existsById(customerId)) {
-            throw new IllegalArgumentException("Customer not found");
+            throw new EntityNotFoundException("Customer not found");
         }
         return orderRepository.findByCustomerId(customerId).stream()
                 .map(this::toDTO)

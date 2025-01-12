@@ -8,7 +8,7 @@ import com.oms.entity.Order;
 import com.oms.repository.CustomerRepository;
 import com.oms.repository.OrderRepository;
 import com.oms.service.impl.OrderServiceImpl;
-import com.oms.util.TestUtil;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -107,7 +107,7 @@ class OrderServiceTest {
     void createOrder_CustomerNotFound_ThrowsException() {
         when(customerRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> 
+        assertThrows(EntityNotFoundException.class, () ->
             orderService.createOrder(testCreateRequest)
         );
     }
@@ -153,7 +153,7 @@ class OrderServiceTest {
     void getOrderById_NotFound_ThrowsException() {
         when(orderRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> 
+        assertThrows(EntityNotFoundException.class, () ->
             orderService.getOrderById(1L)
         );
     }
@@ -178,7 +178,7 @@ class OrderServiceTest {
     void getOrdersByCustomerId_CustomerNotFound_ThrowsException() {
         when(customerRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(IllegalArgumentException.class, () -> 
+        assertThrows(EntityNotFoundException.class, () ->
             orderService.getOrdersByCustomerId(1L)
         );
     }
