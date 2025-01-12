@@ -17,6 +17,11 @@ A Spring Boot application that manages customer orders with a tiered discount sy
 - Automatic discount calculation based on customer tier
 - Track order history per customer
 
+### Notification System
+- Tier upgrade notifications
+- Tier progression alerts
+- Close to tier upgrade notifications
+
 ### Database Schema
 #### Customer Entity
 - Fields:
@@ -43,6 +48,14 @@ A Spring Boot application that manages customer orders with a tiered discount sy
 #### PostgreSQL Database Structure in Adminer
 ![Database Structure](docs/images/oms-db-tables.png)
 *PostgreSQL database structure showing Customer and Order tables in Adminer*
+
+#### Customer Table
+![Customer Table](docs/images/customers-table.png)
+*Customer table with 3 customers as example*
+
+#### Order Table
+![Order Table](docs/images/orders-table-with-discounts.png)
+*Orders table with discount applied orders*
 
 #### Swagger API Documentation
 ![Swagger API Overview](docs/images/swagger-apis.png)
