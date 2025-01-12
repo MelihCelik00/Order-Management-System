@@ -35,6 +35,7 @@ class CustomerServiceTest {
     private Customer testCustomer;
     private CreateCustomerRequest testCreateRequest;
     private CustomerDTO testCustomerDTO;
+    private UpdateCustomerRequest testUpdateRequest;
 
     @BeforeEach
     void setUp() {
