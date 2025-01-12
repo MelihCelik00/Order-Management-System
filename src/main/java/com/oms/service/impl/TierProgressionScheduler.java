@@ -19,16 +19,16 @@ public class TierProgressionScheduler {
     @Autowired
     private NotificationService notificationService;
 
-    // Run daily at midnight
+
     @Scheduled(cron = "0 0 0 * * ?")
     public void checkTierProgressions() {
-        // Check for customers close to GOLD tier (9 orders)
+        // customers close to GOLD tier (9 orders)
         List<Customer> nearGoldCustomers = customerRepository.findByTierAndTotalOrders(
             CustomerTier.REGULAR, 9);
         nearGoldCustomers.forEach(customer -> 
             notificationService.sendTierProgressionAlert(customer, 1));
 
-        // Check for customers close to PLATINUM tier (19 orders)
+        // customers close to PLATINUM tier (19 orders)
         List<Customer> nearPlatinumCustomers = customerRepository.findByTierAndTotalOrders(
             CustomerTier.GOLD, 19);
         nearPlatinumCustomers.forEach(customer -> 

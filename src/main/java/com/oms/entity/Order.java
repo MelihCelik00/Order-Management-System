@@ -47,13 +47,10 @@ public class Order {
             amount = BigDecimal.ZERO;
         }
         
-        // Get discount percentage from customer's tier
-        BigDecimal discountPercentage = customer.getTier().getDiscountPercentage();
+        BigDecimal discountPercentage = customer.getTier().getDiscountPercentage();  
         
-        // Calculate discount amount (rounded to 2 decimal places)
         discountAmount = amount.multiply(discountPercentage).setScale(2, RoundingMode.HALF_UP);
         
-        // Calculate final amount after discount
         finalAmount = amount.subtract(discountAmount);
     }
 } 

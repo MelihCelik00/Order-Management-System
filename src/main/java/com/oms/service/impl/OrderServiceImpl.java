@@ -56,18 +56,14 @@ public class OrderServiceImpl implements OrderService {
         .amount(request.amount())
         .build();
         
-        // The discount calculation happens automatically in Order.prePersist()
         order = orderRepository.save(order);
         
-        // Update customer's order count and tier
         customer.incrementTotalOrders();
         customer = customerRepository.save(customer);
         
-        // Check if customer was upgraded to a new tier
         if (previousTier != customer.getTier()) {
             notificationService.sendTierUpgradeNotification(customer);
         }
-        // Check if customer is close to next tier
         else if ((previousTier == CustomerTier.REGULAR && customer.getTotalOrders() == 9) ||
                  (previousTier == CustomerTier.GOLD && customer.getTotalOrders() == 19)) {
             notificationService.sendTierProgressionAlert(customer, 1);

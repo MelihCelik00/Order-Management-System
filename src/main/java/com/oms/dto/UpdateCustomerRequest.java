@@ -1,6 +1,5 @@
 package com.oms.dto;
 
-import com.oms.entity.CustomerTier;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
